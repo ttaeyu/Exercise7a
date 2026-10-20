@@ -306,3 +306,6 @@ void CExercise7aView::ComputeCircle()
 		m_ptCircle[i] = CPoint((int)x, (int)y);
 	}
 }
+
+
+
