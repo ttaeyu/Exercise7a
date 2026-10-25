@@ -74,12 +74,31 @@ BOOL CExercise7aView::PreCreateWindow(CREATESTRUCT& cs)
 
 // CExercise7aView 그리기
 
-void CExercise7aView::OnDraw(CDC* /*pDC*/)
+void CExercise7aView::OnDraw(CDC* pDC)
 {
 	CExercise7aDoc* pDoc = GetDocument();
 	ASSERT_VALID(pDoc);
 	if (!pDoc)
 		return;
+	// 1. 저장된 사각형 좌표가 있으면 사각형을 화면에 그립니다.[cite: 75, 79]
+	if (!m_rtRect.IsRectEmpty())
+	{
+		pDC->Rectangle(m_rtRect);
+	}
+
+	// 2. 사각형(m_rtRect) 영역 안으로 클리핑을 지정하고 원을 그립니다.[cite: 78, 88]
+	if (!m_rtRect.IsRectEmpty() && m_ptCircle[0] != CPoint(0, 0))
+	{
+		// 사각형 바깥으로 나가는 원을 자르도록 클리핑 영역 설정[cite: 78, 88]
+		pDC->IntersectClipRect(m_rtRect);
+
+		pDC->MoveTo(m_ptCircle[0]);
+		for (int i = 0; i < m_nResolution; i++)
+		{
+			pDC->LineTo(m_ptCircle[i]);
+		}
+		pDC->LineTo(m_ptCircle[0]);
+	}
 
 	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
 }
@@ -272,6 +291,7 @@ void CExercise7aView::OnLButtonUp(UINT nFlags, CPoint point)
 		{
 			m_bLButtonDown = false;
 			m_rtRect = CRect(m_ptStart.x, m_ptStart.y, point.x, point.y);  // 사각형 좌표 저장
+			m_rtRect.NormalizeRect(); // 좌상단/우하단 좌표 정렬 (거꾸로 드래그 방지)
 		}
 		break;
 	case CIRCLE_MODE:
